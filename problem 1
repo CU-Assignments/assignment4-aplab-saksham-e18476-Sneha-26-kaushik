@@ -1,0 +1,45 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+vector<int> beautifulArray(int n) {
+    vector<int> result = {1};  // Start with the array [1]
+
+    // Generate the beautiful array using recursion
+    while (result.size() < n) {
+        vector<int> temp;
+        
+        // For odd numbers: result * 2 - 1
+        for (int num : result) {
+            if (num * 2 - 1 <= n) {
+                temp.push_back(num * 2 - 1);
+            }
+        }
+        
+        // For even numbers: result * 2
+        for (int num : result) {
+            if (num * 2 <= n) {
+                temp.push_back(num * 2);
+            }
+        }
+        
+        result = temp;
+    }
+    
+    return result;
+}
+
+int main() {
+    int n;
+    cin >> n;
+    
+    vector<int> result = beautifulArray(n);
+    
+    for (int num : result) {
+        cout << num << " ";
+    }
+    cout << endl;
+    
+    return 0;
+}
