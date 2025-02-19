@@ -1,0 +1,70 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+
+using namespace std;
+
+// Event structure to store the x coordinate, height and whether it's a start or end event.
+struct Event {
+    int x, height;
+    bool isStart;
+    Event(int x, int height, bool isStart) : x(x), height(height), isStart(isStart) {}
+    
+    bool operator<(const Event& other) const {
+        if (x == other.x) {
+            return isStart ? height > other.height : height < other.height;
+        }
+        return x < other.x;
+    }
+};
+
+vector<vector<int>> getSkyline(vector<vector<int>>& buildings) {
+    vector<Event> events;
+    // Convert the building information into events (start and end).
+    for (auto& b : buildings) {
+        events.emplace_back(b[0], b[2], true);  // Start event
+        events.emplace_back(b[1], b[2], false); // End event
+    }
+    
+    // Sort events primarily by x coordinate, then by height and type of event.
+    sort(events.begin(), events.end());
+
+    priority_queue<int> maxHeap; // Max-heap to keep track of building heights
+    maxHeap.push(0);  // Initialize with ground level
+
+    vector<vector<int>> result;
+    int prevMaxHeight = 0;
+
+    // Sweep through the events
+    for (const auto& event : events) {
+        if (event.isStart) {
+            maxHeap.push(event.height); // Add height to the max heap if it's a start event
+        } else {
+            maxHeap.push(-event.height); // Remove height from the heap if it's an end event
+        }
+
+        int currentMaxHeight = maxHeap.top(); // Get the max height in the heap
+        // If the current max height changes, it's a key point
+        if (currentMaxHeight != prevMaxHeight) {
+            result.push_back({event.x, currentMaxHeight});
+            prevMaxHeight = currentMaxHeight;
+        }
+    }
+
+    return result;
+}
+
+int main() {
+    vector<vector<int>> buildings = {{2,9,10},{3,7,15},{5,12,12},{15,20,10},{19,24,8}};
+    
+    vector<vector<int>> skyline = getSkyline(buildings);
+    
+    // Print the result
+    for (const auto& point : skyline) {
+        cout << "[" << point[0] << "," << point[1] << "] ";
+    }
+    cout << endl;
+
+    return 0;
+}
